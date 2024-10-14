@@ -1,13 +1,13 @@
 ﻿ 
-using Microsoft.AspNetCore.Mvc; 
-using DemoProject.Data;
-using DemoProject.Entities;
-using DemoProject.Models;
-using DemoProject.Repos;
+using Microsoft.AspNetCore.Mvc;    
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TaskFlow.Entities.Data;
+using TaskFlow.DataAccess.Abstract;
+using TaskFlow.Entities.Models;
+using DemoProject.DTOs;
 
 namespace DemoProject.Controllers
 {
@@ -16,17 +16,16 @@ namespace DemoProject.Controllers
    
     public class AuthController : ControllerBase
     {
-        private readonly DemoDb _context;
+        private readonly TaskFlowContext _context;
        private readonly IConfiguration _configuration;
-        private readonly AuthRepos authRepos;
+        private readonly IUserService _userService;
 
-        public AuthController(DemoDb context, IConfiguration configuration,AuthRepos authRepos)
+        public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService)
         {
             _context = context;
-            this.authRepos = authRepos;
             _configuration = configuration;
+            _userService = userService;
         }
-       
 
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] UserForRegiter userDto)
@@ -38,7 +37,7 @@ namespace DemoProject.Controllers
                 Email = userDto.Email,
                 AgeGroup = userDto.AgeGroup,
             }; 
-            await authRepos.Register(newUser, userDto.Password);
+            await _userService.Register(newUser, userDto.Password);
             return StatusCode(StatusCodes.Status201Created);
 
         }
@@ -46,7 +45,7 @@ namespace DemoProject.Controllers
         public async Task<ActionResult> Login([FromBody] UserForLgin userDto)
         {  
 
-            var user=await authRepos.Login(userDto.Username, userDto.Password);
+            var user=await _userService.Login(userDto.Username, userDto.Password);
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Token").Value);

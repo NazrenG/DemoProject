@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskFlow.Core.Abstract;
 using TaskFlow.Entities.Base;
 
 namespace TaskFlow.Entities.Models
 {
     // Team ve User class-inin coxun coxa relation-undan emele gelen 3-cu class-dir.
 
-    public class TeamMember
+    public class TeamMember:IEntity
     {
         public int Id { get; set; }
         public int TeamId { get; set; }

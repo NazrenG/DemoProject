@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaskFlow.Core\TaskFlow.Core.csproj" />
+    <ProjectReference Include="..\TaskFlow.Entities\TaskFlow.Entities.csproj" />
   </ItemGroup>
 
 </Project>

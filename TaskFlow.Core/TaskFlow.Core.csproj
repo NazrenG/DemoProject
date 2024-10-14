@@ -19,8 +19,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TaskFlow.Core\TaskFlow.Core.csproj" />
-  </ItemGroup>
-
 </Project>

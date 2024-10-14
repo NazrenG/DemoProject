@@ -1,9 +1,11 @@
-using DemoProject.Data;
-using DemoProject.Repos;
+ 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TaskFlow.DataAccess.Abstract;
+using TaskFlow.DataAccess.Concrete;
+using TaskFlow.Entities.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +27,22 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<AuthRepos>();
+builder.Services.AddScoped<IUserDal,UserDal>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IAddressDal,AddressDal>();
+builder.Services.AddScoped<IAddressService,AddressService>();
+builder.Services.AddScoped<IQuizDal,QuizDal>();
+builder.Services.AddScoped<IQuizService,QuizService>();
+builder.Services.AddScoped<IProjectDal,ProjectDal>();
+builder.Services.AddScoped<IProjectService,ProjectService>();
+builder.Services.AddScoped<ITaskDal,TaskDal>();
+builder.Services.AddScoped<ITaskService,TaskService>();
+builder.Services.AddScoped<ITeamDal, TeamDal>();
+builder.Services.AddScoped<ITeamService, TeamService>(); 
+builder.Services.AddScoped<ITeamMemberDal,TeamMemberDal>();
+builder.Services.AddScoped<ITeamMemberService,TeamMemberService>(); 
+
+
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -41,9 +58,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var conn = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<DemoDb>(opt =>
+builder.Services.AddDbContext<TaskFlowContext>(opt =>
 {
     opt.UseSqlServer(conn);
+    opt.UseLazyLoadingProxies();
 });
 
 

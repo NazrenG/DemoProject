@@ -1,6 +1,5 @@
-﻿using DemoProject.Entities;
-
-namespace DemoProject.Models
+﻿
+namespace DemoProject.DTOs
 {
     public class UserForRegiter
     {

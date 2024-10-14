@@ -1,22 +1,46 @@
-﻿using DemoProject.Data;
-using DemoProject.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using TaskFlow.DataAccess.Abstract;
+using TaskFlow.Entities.Models;
 
-namespace DemoProject.Repos
+namespace TaskFlow.DataAccess.Concrete
 {
-    public class AuthRepos
+    public class UserService:IUserService
     {
-        private readonly DemoDb db;
+        private readonly IUserDal dal;
 
-        public AuthRepos(DemoDb db)
+        public UserService(IUserDal dal)
         {
-            this.db = db;
+            this.dal = dal;
         }
+
+        public async System.Threading.Tasks.Task Add(User user)
+        {
+           await dal.Add(user);
+        }
+
+        public async System.Threading.Tasks.Task Delete(User user)
+        {
+            await dal.Delete(user);
+        }
+
+        public async Task<User> GetUserById(int id)
+        {
+            return await dal.GetById(f=>f.Id==id);
+        }
+
+        public async Task<List<User>> GetUsers()
+        {
+            return await dal.GetAll();
+        }
+
         public async Task<User> Login(string username, string password)
         {
-            var user = await db.Users.FirstOrDefaultAsync(x => x.Username == username);
+            var user = await dal.GetById(f => f.Username == username);
             if (user == null) { return null; }
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
@@ -41,8 +65,7 @@ namespace DemoProject.Repos
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
-            await db.Users.AddAsync(user);
-            await db.SaveChangesAsync();
+            await dal.Add(user); 
             return user;
         }
 
@@ -55,10 +78,15 @@ namespace DemoProject.Repos
             }
         }
 
+        public async Task Update(User user)
+        {
+            await  dal.Update(user);
+        }
+
         public async Task<bool> UserExists(string username)
         {
-            var hasExist = await db.Users.AnyAsync(c => c.Username == username);
-            return hasExist;
+            var hasExist = await dal.GetById(f=>f.Username==username);
+            return hasExist!=null?true:false;
         }
     }
 }

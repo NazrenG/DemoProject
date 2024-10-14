@@ -20,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TaskFlow.Core\TaskFlow.Core.csproj" />
+    <ProjectReference Include="..\TaskFlow.DataAccess\TaskFlow.DataAccess.csproj" />
+    <ProjectReference Include="..\TaskFlow.Entities\TaskFlow.Entities.csproj" />
   </ItemGroup>
 
 </Project>

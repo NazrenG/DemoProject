@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskFlow.Core.Abstract;
 using TaskFlow.Entities.Base;
 
 namespace TaskFlow.Entities.Models
 {
-    public class Team:BaseEntity
+    public class Team:BaseEntity, IEntity
     {
         public string? Name { get; set; }
         public string? Description { get; set; }

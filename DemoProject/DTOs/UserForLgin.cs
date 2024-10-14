@@ -1,4 +1,4 @@
-﻿namespace DemoProject.Models
+﻿namespace DemoProject.DTOs
 {
     public class UserForLgin
     {
