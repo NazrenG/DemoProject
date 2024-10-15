@@ -403,17 +403,21 @@ namespace TaskFlow.Entities.Migrations
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskAssigne", b =>
                 {
-                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", null)
+                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", "TaskForUser")
                         .WithMany("TaskAssignees")
                         .HasForeignKey("TaskForUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Entities.Models.User", null)
+                    b.HasOne("TaskFlow.Entities.Models.User", "User")
                         .WithMany("TaskAssignees")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("TaskForUser");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskCustomize", b =>
@@ -432,7 +436,7 @@ namespace TaskFlow.Entities.Migrations
                     b.HasOne("TaskFlow.Entities.Models.User", "CreatedBy")
                         .WithMany("TaskForUsers")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TaskFlow.Entities.Models.Project", "Project")
@@ -451,13 +455,13 @@ namespace TaskFlow.Entities.Migrations
                     b.HasOne("TaskFlow.Entities.Models.Project", "Project")
                         .WithMany("TeamMembers")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TaskFlow.Entities.Models.User", "User")
                         .WithMany("TeamMembers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");

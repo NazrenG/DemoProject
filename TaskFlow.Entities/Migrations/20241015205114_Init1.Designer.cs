@@ -12,7 +12,7 @@ using TaskFlow.Entities.Data;
 namespace TaskFlow.Entities.Migrations
 {
     [DbContext(typeof(TaskFlowContext))]
-    [Migration("20241015195105_Init1")]
+    [Migration("20241015205114_Init1")]
     partial class Init1
     {
         /// <inheritdoc />
@@ -105,6 +105,10 @@ namespace TaskFlow.Entities.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
                     b.ToTable("Messages");
                 });
 
@@ -186,6 +190,30 @@ namespace TaskFlow.Entities.Migrations
                     b.ToTable("TaskAssignes");
                 });
 
+            modelBuilder.Entity("TaskFlow.Entities.Models.TaskCustomize", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BackColor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TagColor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("TaskCustomize");
+                });
+
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskForUser", b =>
                 {
                     b.Property<int>("Id")
@@ -215,9 +243,6 @@ namespace TaskFlow.Entities.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TaskForUserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -226,8 +251,6 @@ namespace TaskFlow.Entities.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("TaskForUserId");
 
                     b.ToTable("Tasks");
                 });
@@ -337,16 +360,37 @@ namespace TaskFlow.Entities.Migrations
             modelBuilder.Entity("TaskFlow.Entities.Models.Friend", b =>
                 {
                     b.HasOne("TaskFlow.Entities.Models.User", "UserFriend")
-                        .WithMany()
-                        .HasForeignKey("UserFriendId");
+                        .WithMany("FriendsOf")
+                        .HasForeignKey("UserFriendId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TaskFlow.Entities.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("Friends")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
 
                     b.Navigation("UserFriend");
+                });
+
+            modelBuilder.Entity("TaskFlow.Entities.Models.Message", b =>
+                {
+                    b.HasOne("TaskFlow.Entities.Models.User", "Receiver")
+                        .WithMany("MessagesReceiver")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TaskFlow.Entities.Models.User", "Sender")
+                        .WithMany("MessagesSender")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.Project", b =>
@@ -362,17 +406,32 @@ namespace TaskFlow.Entities.Migrations
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskAssigne", b =>
                 {
-                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", null)
+                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", "TaskForUser")
                         .WithMany("TaskAssignees")
                         .HasForeignKey("TaskForUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TaskFlow.Entities.Models.User", "User")
+                        .WithMany("TaskAssignees")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("TaskForUser");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TaskFlow.Entities.Models.TaskCustomize", b =>
+                {
+                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", "Task")
+                        .WithMany("TaskCustomizes")
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Entities.Models.User", null)
-                        .WithMany("TaskAssignees")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskForUser", b =>
@@ -380,7 +439,7 @@ namespace TaskFlow.Entities.Migrations
                     b.HasOne("TaskFlow.Entities.Models.User", "CreatedBy")
                         .WithMany("TaskForUsers")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TaskFlow.Entities.Models.Project", "Project")
@@ -388,10 +447,6 @@ namespace TaskFlow.Entities.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", null)
-                        .WithMany("TaskForUsers")
-                        .HasForeignKey("TaskForUserId");
 
                     b.Navigation("CreatedBy");
 
@@ -403,13 +458,13 @@ namespace TaskFlow.Entities.Migrations
                     b.HasOne("TaskFlow.Entities.Models.Project", "Project")
                         .WithMany("TeamMembers")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TaskFlow.Entities.Models.User", "User")
                         .WithMany("TeamMembers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -430,12 +485,20 @@ namespace TaskFlow.Entities.Migrations
 
                     b.Navigation("TaskAssignees");
 
-                    b.Navigation("TaskForUsers");
+                    b.Navigation("TaskCustomizes");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Friends");
+
+                    b.Navigation("FriendsOf");
+
+                    b.Navigation("MessagesReceiver");
+
+                    b.Navigation("MessagesSender");
 
                     b.Navigation("Projects");
 

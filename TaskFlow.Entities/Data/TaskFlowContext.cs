@@ -11,40 +11,72 @@ namespace TaskFlow.Entities.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Kullanıcının arkadaş eklediği kişiler (UserId ile ilişkilendirilir)
             modelBuilder.Entity<Friend>()
                 .HasOne(f => f.User)
-                .WithMany(u => u.Friends)  // Kullanıcının arkadaş eklediği kişiler
+                .WithMany(u => u.Friends)
                 .HasForeignKey(f => f.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Kullanıcının arkadaş olarak eklendiği kişiler (UserFriendId ile ilişkilendirilir)
             modelBuilder.Entity<Friend>()
                 .HasOne(f => f.UserFriend)
-                .WithMany(u => u.FriendsOf)  // Kullanıcının arkadaş olarak eklendiği kişiler
+                .WithMany(u => u.FriendsOf)
                 .HasForeignKey(f => f.UserFriendId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
       .HasOne(m => m.Sender)
-      .WithMany(u => u.MessagesSender)  // Gönderenin mesajları
+      .WithMany(u => u.MessagesSender)
       .HasForeignKey(m => m.SenderId)
       .OnDelete(DeleteBehavior.Restrict);
 
-            // Receiver ile ilişkiyi yapılandırma
+
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Receiver)
-                .WithMany(u => u.MessagesReceiver)  // Alıcının mesajları
+                .WithMany(u => u.MessagesReceiver)
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TaskForUser>()
+       .HasOne(t => t.CreatedBy)
+       .WithMany(u => u.TaskForUsers)
+       .HasForeignKey(t => t.CreatedById)
+       .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<TaskAssigne>()
+                .HasOne(ta => ta.User)
+                .WithMany(u => u.TaskAssignees)
+                .HasForeignKey(ta => ta.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<TaskAssigne>()
+                .HasOne(ta => ta.TaskForUser)
+                .WithMany(t => t.TaskAssignees)
+                .HasForeignKey(ta => ta.TaskForUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TeamMember>()
+                .HasOne(tm => tm.User)
+                .WithMany(u => u.TeamMembers)
+                .HasForeignKey(tm => tm.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TeamMember>()
+                .HasOne(tm => tm.Project)
+                .WithMany(p => p.TeamMembers)
+                .HasForeignKey(tm => tm.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
         }
 
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<Comment>Comments { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Quiz> Quizzes { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<TaskForUser> Tasks { get; set; }
-        public virtual DbSet<Friend> Teams { get; set; }  
+        public virtual DbSet<Friend> Teams { get; set; }
         public virtual DbSet<TeamMember> TeamMembers { get; set; }
         public virtual DbSet<Friend> Friends { get; set; }
         public virtual DbSet<TaskAssigne> TaskAssignes { get; set; }
