@@ -8,7 +8,7 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Abstract
 {
-    public interface ITeamDal : IEntityRepository<Team>
+    public interface ITaskAssignDal : IEntityRepository<TaskAssigne>
     {
     }
 }

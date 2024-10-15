@@ -14,7 +14,7 @@ namespace TaskFlow.Entities.Data
         public virtual DbSet<Quiz> Quizzes { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<TaskForUser> Tasks { get; set; }
-        public virtual DbSet<Team> Teams { get; set; }  
+        public virtual DbSet<Friend> Teams { get; set; }  
         public virtual DbSet<TeamMember> TeamMembers { get; set; }
 
     }

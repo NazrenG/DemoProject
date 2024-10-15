@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TaskFlow.Business.Abstract;
+using TaskFlow.Business.Concrete;
 using TaskFlow.DataAccess.Abstract;
 using TaskFlow.DataAccess.Concrete;
 using TaskFlow.Entities.Data;
@@ -29,18 +31,24 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IUserDal,UserDal>();
 builder.Services.AddScoped<IUserService,UserService>();
-builder.Services.AddScoped<IAddressDal,AddressDal>();
-builder.Services.AddScoped<IAddressService,AddressService>();
+builder.Services.AddScoped<ICommentDal,CommentDal>();
+builder.Services.AddScoped<ICommentService,CommentService>();
 builder.Services.AddScoped<IQuizDal,QuizDal>();
 builder.Services.AddScoped<IQuizService,QuizService>();
 builder.Services.AddScoped<IProjectDal,ProjectDal>();
 builder.Services.AddScoped<IProjectService,ProjectService>();
 builder.Services.AddScoped<ITaskDal,TaskDal>();
 builder.Services.AddScoped<ITaskService,TaskService>();
-builder.Services.AddScoped<ITeamDal, TeamDal>();
-builder.Services.AddScoped<ITeamService, TeamService>(); 
+builder.Services.AddScoped<ITaskCustomizeDal, TaskCustomizeDal>();
+builder.Services.AddScoped<ITaskCustomizeService, TaskCustomizeService>(); 
 builder.Services.AddScoped<ITeamMemberDal,TeamMemberDal>();
 builder.Services.AddScoped<ITeamMemberService,TeamMemberService>(); 
+builder.Services.AddScoped<IMessageDal,MessageDal>(); 
+builder.Services.AddScoped<IMessageService,MessageService>(); 
+builder.Services.AddScoped<IFriendDal,FriendDal>(); 
+builder.Services.AddScoped<IFriendService,FriendService>(); 
+builder.Services.AddScoped<ITaskAssignDal,TaskAssignDal>(); 
+builder.Services.AddScoped<ITaskAssignService,TaskAssigneService>(); 
 
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value);

@@ -10,9 +10,9 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Concrete
 {
-    public class TeamDal : EFEntityBaseRepository<TaskFlowContext, Team>, ITeamDal
+    public class TaskAssignDal : EFEntityBaseRepository<TaskFlowContext, TaskAssigne>, ITaskAssignDal
     {
-        public TeamDal(TaskFlowContext context) : base(context)
+        public TaskAssignDal(TaskFlowContext context) : base(context)
         {
         }
     }

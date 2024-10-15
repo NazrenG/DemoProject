@@ -20,11 +20,13 @@ namespace TaskFlow.Entities.Models
         public string? Priority { get; set; }// Urgent, Primary, Simple
         public int ProjectId { get; set; }
 
-        public int CreatorId { get; set; }
+        public int CreatedById { get; set; }//userId
         //
-
-        public virtual List<User>? AssignedUsers { get; set; }
-        public virtual User? User { get; set; }
+         
+        public virtual User? CreatedBy { get; set; }
         public virtual Project? Project { get; set; }
+        public virtual List<TaskForUser>? TaskForUsers { get; set; } 
+        public virtual List<Comment>? Comments { get; set; } 
+        public virtual List<TaskAssigne>? TaskAssignees { get; set; } 
     }
 }

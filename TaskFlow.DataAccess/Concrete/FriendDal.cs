@@ -10,9 +10,9 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Concrete
 {
-    public class AddressDal : EFEntityBaseRepository<TaskFlowContext, Address>, IAddressDal
+    public class FriendDal : EFEntityBaseRepository<TaskFlowContext, Friend>,IFriendDal
     {
-        public AddressDal(TaskFlowContext context) : base(context)
+        public FriendDal(TaskFlowContext context) : base(context)
         {
         }
     }

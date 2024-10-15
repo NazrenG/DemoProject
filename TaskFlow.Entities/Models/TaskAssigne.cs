@@ -8,9 +8,9 @@ using TaskFlow.Entities.Base;
 
 namespace TaskFlow.Entities.Models
 {
-    public class Team:BaseEntity, IEntity
-    {
-        public string? Name { get; set; }
-        public string? Description { get; set; }
+    public class TaskAssigne:BaseEntity ,IEntity
+    { 
+        public int TaskForUserId { get; set; }
+        public int UserId { get; set; } 
     }
 }

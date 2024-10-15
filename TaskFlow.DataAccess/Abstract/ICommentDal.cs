@@ -8,7 +8,7 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Abstract
 {
-    public interface IAddressDal:IEntityRepository<Address>
+    public interface ICommentDal:IEntityRepository<Comment>
     {
     }
 }
