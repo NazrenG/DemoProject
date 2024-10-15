@@ -18,12 +18,12 @@ namespace TaskFlow.DataAccess.Concrete
             this.dal = dal;
         }
 
-        public async System.Threading.Tasks.Task Add(User user)
+        public async  Task Add(User user)
         {
            await dal.Add(user);
         }
 
-        public async System.Threading.Tasks.Task Delete(User user)
+        public async Task Delete(User user)
         {
             await dal.Delete(user);
         }

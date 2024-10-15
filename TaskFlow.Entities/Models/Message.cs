@@ -14,5 +14,8 @@ namespace TaskFlow.Entities.Models
         public int SenderId { get; set; }    
         public int ReceiverId { get; set; }    
         public DateTime SentDate { get; set; }
+
+        public virtual User? Sender { get; set; }
+        public virtual User? Receiver { get; set; }
     }
 }

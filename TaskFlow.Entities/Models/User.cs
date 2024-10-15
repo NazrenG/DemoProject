@@ -5,6 +5,7 @@ namespace TaskFlow.Entities.Models
 {
     public class User:BaseEntity,IEntity
     {
+        public string? Username { get; set; }
         public string? Firstname { get; set; }
         public string? Lastname { get; set; }
         public string? Email { get; set; }
@@ -26,6 +27,11 @@ namespace TaskFlow.Entities.Models
         public virtual List<TeamMember>? TeamMembers { get; set; }   
         public virtual List<Comment>? Comments { get; set; }
         public virtual List<TaskAssigne>? TaskAssignees { get; set; }
+        public virtual List<Message>? MessagesSender { get; set; }  
+        public virtual List<Message>? MessagesReceiver { get; set; }
+
+        public virtual List<Friend>? Friends { get; set; } 
+        public virtual List<Friend>? FriendsOf { get; set; }
 
     }
 }

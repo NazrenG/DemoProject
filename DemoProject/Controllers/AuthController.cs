@@ -35,7 +35,7 @@ namespace DemoProject.Controllers
             {
                 Username = userDto.Username,
                 Email = userDto.Email,
-                AgeGroup = userDto.AgeGroup,
+               // AgeGroup = userDto.AgeGroup,
             }; 
             await _userService.Register(newUser, userDto.Password);
             return StatusCode(StatusCodes.Status201Created);
