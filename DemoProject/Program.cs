@@ -1,4 +1,5 @@
- 
+
+using DemoProject.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,18 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
+builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
-});
+    builder.WithOrigins("http://localhost:3001/").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+}));
+
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IUserDal,UserDal>();
 builder.Services.AddScoped<IUserService,UserService>();
@@ -75,7 +72,7 @@ builder.Services.AddDbContext<TaskFlowContext>(opt =>
 
 var app = builder.Build();
 
-app.UseCors("AllowAllOrigins"); 
+
 
 
 // Configure the HTTP request pipeline.
@@ -86,10 +83,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
- 
+app.UseCors(x =>
+{
+    x.AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true)
+    .AllowCredentials();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapHub<ConnectionHub>("/connect");
 app.Run();
