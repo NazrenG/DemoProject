@@ -8,7 +8,7 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Abstract
 {
-    public interface ITaskDal : IEntityRepository<TaskForUser>
+    public interface ITaskDal : IEntityRepository<Work>
     {
     }
 }

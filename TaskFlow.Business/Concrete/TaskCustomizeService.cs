@@ -28,12 +28,12 @@ namespace TaskFlow.DataAccess.Concrete
                   .Delete(taskCustomize);
         }
 
-        public async Task<TaskCustomize> GetTeamById(int id)
+        public async Task<TaskCustomize> GetCustomizeById(int id)
         {
            return await dal.GetById(f=> f.Id == id);    
         }
 
-        public async Task<List<TaskCustomize>> GetTeams()
+        public async Task<List<TaskCustomize>> GetCustomize()
         {
             return await dal.GetAll();
         }

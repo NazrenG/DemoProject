@@ -14,7 +14,7 @@ namespace TaskFlow.Entities.Models
         public int ? TaskForUserId { get; set; }
         public int ? UserId { get; set; }
 
-        public virtual TaskForUser? TaskForUser { get; set; }
+        public virtual Work? TaskForUser { get; set; }
         public virtual User? User { get; set; }
 
     }

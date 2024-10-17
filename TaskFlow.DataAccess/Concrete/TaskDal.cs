@@ -8,7 +8,7 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Concrete
 {
-    public class TaskDal : EFEntityBaseRepository<TaskFlowContext, TaskForUser>, ITaskDal
+    public class TaskDal : EFEntityBaseRepository<TaskFlowContext, Work>, ITaskDal
     {
         public TaskDal(TaskFlowContext context) : base(context)
         {

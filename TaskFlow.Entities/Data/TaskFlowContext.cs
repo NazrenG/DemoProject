@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskFlow.Entities.Models;
-using TaskForUser = TaskFlow.Entities.Models.TaskForUser;
+using Work = TaskFlow.Entities.Models.Work;
 
 namespace TaskFlow.Entities.Data
 {
@@ -36,7 +36,7 @@ namespace TaskFlow.Entities.Data
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<TaskForUser>()
+            modelBuilder.Entity<Work>()
        .HasOne(t => t.CreatedBy)
        .WithMany(u => u.TaskForUsers)
        .HasForeignKey(t => t.CreatedById)
@@ -75,7 +75,7 @@ namespace TaskFlow.Entities.Data
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Quiz> Quizzes { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
-        public virtual DbSet<TaskForUser> Tasks { get; set; }
+        public virtual DbSet<Work> Tasks { get; set; }
         public virtual DbSet<Friend> Teams { get; set; }
         public virtual DbSet<TeamMember> TeamMembers { get; set; }
         public virtual DbSet<Friend> Friends { get; set; }
