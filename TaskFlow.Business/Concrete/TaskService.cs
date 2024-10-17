@@ -13,27 +13,27 @@ namespace TaskFlow.DataAccess.Concrete
             this.dal = dal;
         }
 
-        public async  Task Add( TaskForUser task)
+        public async  Task Add( Work task)
         { 
             await dal.Add(task);
         }
 
-        public async Task Delete(TaskForUser task)
+        public async Task Delete(Work task)
         {
            await dal.Delete(task);
         }
 
-        public async Task<TaskForUser> GetTaskById(int id)
+        public async Task<Work> GetTaskById(int id)
         {
             return await dal.GetById(f => f.Id == id);
         }
 
-        public async Task<List<TaskForUser>> GetTasks()
+        public async Task<List<Work>> GetTasks()
         {
             return await dal.GetAll();
         }
 
-        public async Task Update(TaskForUser task)
+        public async Task Update(Work task)
         {
           await dal.Update(task);
         }

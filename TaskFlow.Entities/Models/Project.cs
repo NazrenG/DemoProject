@@ -16,7 +16,7 @@ namespace TaskFlow.Entities.Models
         public bool IsCompleted { get; set; }   
 
         public virtual User? CreatedBy { get; set; }
-        public virtual List<TaskForUser>? TaskForUsers { get;set; }
+        public virtual List<Work>? TaskForUsers { get;set; }
         public virtual List<TeamMember>? TeamMembers { get; set; }
 
     }

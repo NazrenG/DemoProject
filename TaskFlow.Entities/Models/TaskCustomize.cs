@@ -15,7 +15,7 @@ namespace TaskFlow.Entities.Models
         public string? BackColor { get; set; }
         public string? TagColor { get; set; } 
         public int TaskId { get; set; }
-        public virtual TaskForUser? Task { get; set; }
+        public virtual Work? Task { get; set; }
 
     }
 }

@@ -10,8 +10,8 @@ namespace TaskFlow.DataAccess.Abstract
 {
     public interface ICommentService
     {
-        Task<List<Comment>> GetAddresses();
-        Task<Comment> GetAddressById(int id);
+        Task<List<Comment>> GetComments();
+        Task<Comment> GetCommentById(int id);
         Task Add(Comment comment);
         Task Update(Comment comment);
         Task Delete(Comment comment);

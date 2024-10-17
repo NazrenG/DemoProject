@@ -9,11 +9,11 @@ namespace TaskFlow.DataAccess.Abstract
 {
     public interface ITaskService
     {
-        Task<List<TaskForUser>> GetTasks();
-        Task<TaskForUser> GetTaskById(int id);
-      Task Add(TaskForUser task);
-      Task Update(TaskForUser task);
-      Task Delete(TaskForUser task);
+        Task<List<Work>> GetTasks();
+        Task<Work> GetTaskById(int id);
+      Task Add(Work task);
+      Task Update(Work task);
+      Task Delete(Work task);
 
     }
 }

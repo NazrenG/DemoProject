@@ -17,6 +17,11 @@ namespace TaskFlow.DataAccess.Concrete
             this.dal = dal;
         }
 
+        public async Task Add(Quiz quiz)
+        {
+            await dal.Add(quiz);    
+        }
+
         public async Task<List<Quiz>> Quizzes()
         {
             return await dal.GetAll();

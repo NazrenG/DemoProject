@@ -9,7 +9,7 @@ namespace TaskFlow.DataAccess.Abstract
 {
     public interface IQuizService
     {
-
+        Task Add(Quiz quiz);    
         Task<List<Quiz>> Quizzes(); 
     }
 }

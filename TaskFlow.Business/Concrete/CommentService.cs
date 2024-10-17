@@ -27,12 +27,12 @@ namespace TaskFlow.DataAccess.Concrete
           await dal.Delete(comment);
         }
 
-        public async Task<Comment> GetAddressById(int id)
+        public async Task<Comment> GetCommentById(int id)
         {
           return await dal.GetById(f=>f.Id == id);
         }
 
-        public async Task<List<Comment>> GetAddresses()
+        public async Task<List<Comment>> GetComments()
         {
            return await dal.GetAll();
         }

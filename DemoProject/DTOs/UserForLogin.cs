@@ -1,6 +1,6 @@
 ﻿namespace DemoProject.DTOs
 {
-    public class UserForLgin
+    public class UserForLogin
     {
 
         public string Username { get; set; } 

@@ -8,7 +8,7 @@ using TaskFlow.Entities.Base;
 
 namespace TaskFlow.Entities.Models
 {
-    public class TaskForUser: BaseEntity, IEntity
+    public class Work: BaseEntity, IEntity
     {
         public string? Title { get; set; }
 

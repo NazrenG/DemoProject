@@ -23,7 +23,7 @@ namespace TaskFlow.Entities.Models
        
 
         public virtual List<Project>? Projects { get; set; } 
-        public virtual List<TaskForUser>? TaskForUsers { get; set; } 
+        public virtual List<Work>? TaskForUsers { get; set; } 
         public virtual List<TeamMember>? TeamMembers { get; set; }   
         public virtual List<Comment>? Comments { get; set; }
         public virtual List<TaskAssigne>? TaskAssignees { get; set; }
