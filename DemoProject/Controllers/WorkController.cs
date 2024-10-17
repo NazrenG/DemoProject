@@ -84,8 +84,25 @@ namespace DemoProject.Controllers
         }
 
         // PUT api/<WorkController>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] WorkDto value)
+        [HttpPut("ChangeTitle/{id}")]
+        public async Task<IActionResult> PutTitle(int id, [FromBody] string value)
+        {
+            var item = await taskService.GetTaskById(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            } 
+            //item.Description = value.Description;
+            //item.Deadline = value.Deadline;
+            //   item.Priority = value.Priority;
+            //item.Status = value.Status;
+            item.Title = value; 
+            await taskService.Update(item);
+            return Ok();
+        }
+        [HttpPut("ChangeDescription/{id}")]
+        public async Task<IActionResult> PutDescription(int id, [FromBody] string value)
         {
             var item = await taskService.GetTaskById(id);
 
@@ -93,13 +110,48 @@ namespace DemoProject.Controllers
             {
                 return NotFound();
             }
-            item.CreatedById = value.CreatedById;
-            item.Description = value.Description;
-            item.Deadline = value.Deadline;
-               item.Priority = value.Priority;
-            item.Status = value.Status;
-            item.Title = value.Title;
-            item.ProjectId = value.ProjectId;
+            item.Description = value; 
+            await taskService.Update(item);
+            return Ok();
+        }
+
+        [HttpPut("ChangeDeadLine/{id}")]
+        public async Task<IActionResult> PutDeadLine(int id, [FromBody] DateTime value)
+        {
+            var item = await taskService.GetTaskById(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            } 
+            item.Deadline = value; 
+            await taskService.Update(item);
+            return Ok();
+        }
+
+        [HttpPut("ChangeStatus/{id}")]
+        public async Task<IActionResult> PutStatus(int id, [FromBody] string value)
+        {
+            var item = await taskService.GetTaskById(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            } 
+            item.Status = value; 
+            await taskService.Update(item);
+            return Ok();
+        }
+        [HttpPut("ChangePriority/{id}")]
+        public async Task<IActionResult> PutPriority(int id, [FromBody] string value)
+        {
+            var item = await taskService.GetTaskById(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+              item.Priority = value; 
             await taskService.Update(item);
             return Ok();
         }

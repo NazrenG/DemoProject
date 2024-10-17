@@ -12,14 +12,34 @@ namespace DemoProject.Controllers
     [ApiController]
     public class TaskCustomizeController : ControllerBase
     {
-        private readonly  ITaskCustomizeService _taskCustomizeService;
-       
+        private readonly ITaskCustomizeService _taskCustomizeService;
+
         public TaskCustomizeController(ITaskCustomizeService taskCustomizeService)
         {
             _taskCustomizeService = taskCustomizeService;
         }
 
         // GET: api/<TaskCustomizeController>
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var items = await _taskCustomizeService.GetCustomize();
+            if (items == null)
+            {
+                return NotFound();
+            }
+            var list = items.Select(l =>
+            {
+                return new TaskCustomizeDto
+                {
+                    TagColor = l.TagColor,
+                    BackColor = l.BackColor,
+                    TaskId = l.TaskId
+                };
+            });
+            return Ok(list);
+
+        }
         [HttpGet("BackColors")]
         public async Task<IActionResult> GetBackColors()
         {
@@ -28,7 +48,7 @@ namespace DemoProject.Controllers
 
             var backGroundColorList = list.Select(c => c.BackColor).Distinct().ToList();
 
-            return Ok(backGroundColorList);    
+            return Ok(backGroundColorList);
         }
 
         [HttpGet("TagColors")]
@@ -53,9 +73,9 @@ namespace DemoProject.Controllers
             }
             var project = new TaskCustomizeDto
             {
-            TagColor = item.TagColor,
-            BackColor = item.BackColor,
-            TaskId = item.TaskId
+                TagColor = item.TagColor,
+                BackColor = item.BackColor,
+                TaskId = item.TaskId
             };
             return Ok(project);
 
@@ -69,7 +89,7 @@ namespace DemoProject.Controllers
             {
                 TagColor = value.TagColor,
                 BackColor = value.BackColor,
-                TaskId = value.TaskId, 
+                TaskId = value.TaskId,
             };
             await _taskCustomizeService.Add(item);
             return Ok(item);
@@ -83,7 +103,7 @@ namespace DemoProject.Controllers
             if (item == null) { return NotFound(); }
             item.BackColor = value;
             await _taskCustomizeService.Update(item);
-            return Ok( );
+            return Ok();
 
         }
         [HttpPut("TagColor/{id}")]
@@ -102,7 +122,7 @@ namespace DemoProject.Controllers
         {
             var item = await _taskCustomizeService.GetCustomizeById(id);
             if (item == null) { return NotFound(); };
-            await _taskCustomizeService.Delete(item);   
+            await _taskCustomizeService.Delete(item);
             return Ok();
         }
     }

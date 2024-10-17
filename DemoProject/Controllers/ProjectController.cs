@@ -73,8 +73,9 @@ namespace DemoProject.Controllers
         }
 
         // PUT api/<ProjectController>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ProjectDto value)
+   
+        [HttpPut("ChangeTitle/{id}")]
+        public async Task<IActionResult> PutTitle(int id, [FromBody] string value)
         {
             var item = await _projectService.GetProjectById(id);
 
@@ -82,14 +83,38 @@ namespace DemoProject.Controllers
             {
                 return NotFound();
             }
-            item.Description = value.Description;
-            item.Title = value.Title;
-            item.CreatedById = value.CreatedById;
-            item.IsCompleted = value.IsCompleted;
-            await _projectService.Update(item); 
+            item.Title = value;
+            await _projectService.Update(item);
             return Ok();
         }
 
+        [HttpPut("ChangeDescription/{id}")]
+        public async Task<IActionResult> PutDescription(int id, [FromBody] string value)
+        {
+            var item = await _projectService.GetProjectById(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+            item.Description = value;
+            await _projectService.Update(item);
+            return Ok();
+        }
+
+        [HttpPut("ChangeCompleted/{id}")]
+        public async Task<IActionResult> PutCompleted(int id, [FromBody] bool value)
+        {
+            var item = await _projectService.GetProjectById(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+            item.IsCompleted = value;
+            await _projectService.Update(item);
+            return Ok();
+        }
         // DELETE api/<ProjectController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
