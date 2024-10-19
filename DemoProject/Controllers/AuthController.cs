@@ -28,27 +28,22 @@ namespace DemoProject.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] UserForRegister userDto)
+        public async Task<IActionResult> Register([FromBody] UserForRegister userDto)
         {
             var ad = userDto.Username;
             var newUser = new User
             {
-                Firstname = userDto.Firstname,
-                Lastname = userDto.Lastname,
                 Username = userDto.Username,
                 Email = userDto.Email,
-                Phone = userDto.Phone,
-                Occupation = userDto.Occupation,
-                Country = userDto.Country,
-                City = userDto.City,
-                Image = userDto.Image,
-                Gender = userDto.Gender,
-                IsOnline = userDto.IsOnline,
+
                 // AgeGroup = userDto.AgeGroup,
             };
-            await _userService.Register(newUser, userDto.Password);
-            return StatusCode(StatusCodes.Status201Created);
-
+              await _userService.Register(newUser, userDto.Password);
+            return Ok(new
+            {
+                message = "User registered successfully",
+                
+            });
         }
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] UserForLogin userDto)
@@ -127,7 +122,7 @@ namespace DemoProject.Controllers
                 return Ok(item);
             }
             return NotFound(item);
-             
+
         }
 
         [HttpPut("{id}")]
