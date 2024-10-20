@@ -36,6 +36,14 @@ namespace DemoProject.Controllers
             return Ok(items);
         }
 
+        [HttpGet("UserProjectCount")]
+        public async Task<IActionResult> GetUserProjectCount(int id)
+        {
+            var count = await _projectService.GetUserProjectCount(id);
+            
+            return Ok(count);
+        }
+
         // GET api/<ProjectController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)

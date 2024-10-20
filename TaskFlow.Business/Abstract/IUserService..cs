@@ -20,5 +20,6 @@ namespace TaskFlow.DataAccess.Abstract
 
         Task<User> Register(User user, string password); 
           Task<bool> UserExists(string username);
+        Task<int> GetAllUserCount();
     }
 }

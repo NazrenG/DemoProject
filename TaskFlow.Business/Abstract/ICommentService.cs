@@ -15,6 +15,7 @@ namespace TaskFlow.DataAccess.Abstract
         Task Add(Comment comment);
         Task Update(Comment comment);
         Task Delete(Comment comment);
+        Task<int> GetCount();
 
     }
 }

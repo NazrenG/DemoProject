@@ -81,6 +81,7 @@ namespace TaskFlow.Entities.Data
         public virtual DbSet<Friend> Friends { get; set; }
         public virtual DbSet<TaskAssigne> TaskAssignes { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }  
 
 
     }

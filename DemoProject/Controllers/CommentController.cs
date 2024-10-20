@@ -20,7 +20,7 @@ namespace DemoProject.Controllers
         }
 
         // GET: api/<CommentController>
-        [HttpGet]
+        [HttpGet("Commits")]
         public async Task<IActionResult> Get()
         {
             var list = await _commentService.GetComments();
@@ -34,6 +34,13 @@ namespace DemoProject.Controllers
                 };
             });
             return Ok(items);
+        }
+        [HttpGet("CommitCount")]
+        public async Task<IActionResult> GetCommintCount()
+        {
+            var count = await _commentService.GetCount();
+           
+            return Ok(count);
         }
 
         // GET api/<CommentController>/5

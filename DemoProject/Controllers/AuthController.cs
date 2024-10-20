@@ -8,6 +8,7 @@ using TaskFlow.Entities.Data;
 using TaskFlow.DataAccess.Abstract;
 using TaskFlow.Entities.Models;
 using DemoProject.DTOs;
+using TaskFlow.DataAccess.Concrete;
 
 namespace DemoProject.Controllers
 {
@@ -19,6 +20,7 @@ namespace DemoProject.Controllers
         private readonly TaskFlowContext _context;
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
+        
 
         public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService)
         {
@@ -63,12 +65,54 @@ namespace DemoProject.Controllers
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
-
+            if(user==null) return Unauthorized("Invalid username or password.");
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            return Ok(tokenString);
+            return Ok(new
+            {
+                Token = tokenString,
+                User = new
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Firstname=user.Firstname,
+                    Lastname=user.Lastname,
+
+                }
+            });
 
         }
+
+        [HttpGet("currentUser")]
+        public IActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var username = User.FindFirstValue(ClaimTypes.Name);
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var surname = User.FindFirst(ClaimTypes.Surname)?.Value;
+            var gender = User.FindFirst(ClaimTypes.Gender)?.Value;
+            var birthday = User.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+            var phone = User.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            var country = User.FindFirst(ClaimTypes.Country)?.Value;
+  
+            if (userId == null)
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            return Ok(new
+            {
+                UserId = userId,
+                Username = username,
+                Email = email,
+                Surname = surname,
+                Gender = gender,
+                Birthday = birthday,
+                Phone = phone,
+                Country = country,
+            });
+        }
+
         [HttpGet("AllUsers")]
         public async Task<IEnumerable<UserForRegister>> AllUsers()
         {
@@ -92,6 +136,16 @@ namespace DemoProject.Controllers
             });
             return list;
         }
+
+        [HttpGet("UsersCount")]
+        public async Task<IActionResult> GetUserCount()
+        {
+            var count = await _userService.GetAllUserCount();
+
+            return Ok(count);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<UserForRegister> GetUser(int id)
         {
@@ -143,6 +197,20 @@ namespace DemoProject.Controllers
                 item.Image = value.Image;
                 item.Gender = value.Gender;
                 item.IsOnline = value.IsOnline;
+                await _userService.Update(item);
+                return Ok();
+            }
+            return BadRequest();
+
+        }
+        [HttpPut("NameOrLastname/{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] string name, [FromBody] string last)
+        {
+            var item = await _userService.GetUserById(id);
+            if (item != null)
+            { 
+                item.Firstname = name;
+                item.Lastname = last;
                 await _userService.Update(item);
                 return Ok();
             }
