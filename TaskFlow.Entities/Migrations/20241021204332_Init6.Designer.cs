@@ -12,8 +12,8 @@ using TaskFlow.Entities.Data;
 namespace TaskFlow.Entities.Migrations
 {
     [DbContext(typeof(TaskFlowContext))]
-    [Migration("20241015205114_Init1")]
-    partial class Init1
+    [Migration("20241021204332_Init6")]
+    partial class Init6
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,6 +112,30 @@ namespace TaskFlow.Entities.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("TaskFlow.Entities.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("TaskFlow.Entities.Models.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -159,7 +183,14 @@ namespace TaskFlow.Entities.Migrations
                     b.Property<string>("UsagePurpose")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Quizzes");
                 });
@@ -212,47 +243,6 @@ namespace TaskFlow.Entities.Migrations
                     b.HasIndex("TaskId");
 
                     b.ToTable("TaskCustomize");
-                });
-
-            modelBuilder.Entity("TaskFlow.Entities.Models.TaskForUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Deadline")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Priority")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TeamMember", b =>
@@ -342,9 +332,50 @@ namespace TaskFlow.Entities.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TaskFlow.Entities.Models.Work", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Deadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Priority")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Tasks");
+                });
+
             modelBuilder.Entity("TaskFlow.Entities.Models.Comment", b =>
                 {
-                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", "TaskForUser")
+                    b.HasOne("TaskFlow.Entities.Models.Work", "TaskForUser")
                         .WithMany("Comments")
                         .HasForeignKey("TaskForUserId");
 
@@ -393,6 +424,17 @@ namespace TaskFlow.Entities.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("TaskFlow.Entities.Models.Notification", b =>
+                {
+                    b.HasOne("TaskFlow.Entities.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TaskFlow.Entities.Models.Project", b =>
                 {
                     b.HasOne("TaskFlow.Entities.Models.User", "CreatedBy")
@@ -404,9 +446,18 @@ namespace TaskFlow.Entities.Migrations
                     b.Navigation("CreatedBy");
                 });
 
+            modelBuilder.Entity("TaskFlow.Entities.Models.Quiz", b =>
+                {
+                    b.HasOne("TaskFlow.Entities.Models.User", "User")
+                        .WithOne("Quiz")
+                        .HasForeignKey("TaskFlow.Entities.Models.Quiz", "UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskAssigne", b =>
                 {
-                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", "TaskForUser")
+                    b.HasOne("TaskFlow.Entities.Models.Work", "TaskForUser")
                         .WithMany("TaskAssignees")
                         .HasForeignKey("TaskForUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -425,32 +476,13 @@ namespace TaskFlow.Entities.Migrations
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TaskCustomize", b =>
                 {
-                    b.HasOne("TaskFlow.Entities.Models.TaskForUser", "Task")
+                    b.HasOne("TaskFlow.Entities.Models.Work", "Task")
                         .WithMany("TaskCustomizes")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Task");
-                });
-
-            modelBuilder.Entity("TaskFlow.Entities.Models.TaskForUser", b =>
-                {
-                    b.HasOne("TaskFlow.Entities.Models.User", "CreatedBy")
-                        .WithMany("TaskForUsers")
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Entities.Models.Project", "Project")
-                        .WithMany("TaskForUsers")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.TeamMember", b =>
@@ -472,20 +504,30 @@ namespace TaskFlow.Entities.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaskFlow.Entities.Models.Work", b =>
+                {
+                    b.HasOne("TaskFlow.Entities.Models.User", "CreatedBy")
+                        .WithMany("TaskForUsers")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TaskFlow.Entities.Models.Project", "Project")
+                        .WithMany("TaskForUsers")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("TaskFlow.Entities.Models.Project", b =>
                 {
                     b.Navigation("TaskForUsers");
 
                     b.Navigation("TeamMembers");
-                });
-
-            modelBuilder.Entity("TaskFlow.Entities.Models.TaskForUser", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("TaskAssignees");
-
-                    b.Navigation("TaskCustomizes");
                 });
 
             modelBuilder.Entity("TaskFlow.Entities.Models.User", b =>
@@ -500,13 +542,26 @@ namespace TaskFlow.Entities.Migrations
 
                     b.Navigation("MessagesSender");
 
+                    b.Navigation("Notifications");
+
                     b.Navigation("Projects");
+
+                    b.Navigation("Quiz");
 
                     b.Navigation("TaskAssignees");
 
                     b.Navigation("TaskForUsers");
 
                     b.Navigation("TeamMembers");
+                });
+
+            modelBuilder.Entity("TaskFlow.Entities.Models.Work", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("TaskAssignees");
+
+                    b.Navigation("TaskCustomizes");
                 });
 #pragma warning restore 612, 618
         }
