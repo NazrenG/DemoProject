@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -99,6 +101,32 @@ namespace TaskFlow.DataAccess.Concrete
         {
             var list = await dal.GetAll();
             return list.Count;
+        }
+
+
+        public Task<User>  GetUserByToken(string token)
+        {
+            try
+            { 
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+
+                if (jwtToken == null)
+                    return null;
+                 
+                var userIdClaim = jwtToken.Claims.First(claim => claim.Type == "nameid").Value;
+                 
+                int userId = int.Parse(userIdClaim);
+                 
+                var user = dal.GetById(p=>p.Id==userId);
+
+                return user;
+            }
+            catch (Exception ex)
+            { 
+                Console.WriteLine($"Error decoding token: {ex.Message}");
+                return null;
+            }
         }
     }
 }

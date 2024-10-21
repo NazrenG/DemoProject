@@ -22,8 +22,8 @@ namespace DemoProject.Controllers
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
         private readonly IQuizService _quizService;
-        
 
+        public static int CurrentUser;
         public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService,IQuizService quizService)
         {
             _context = context;
@@ -72,6 +72,7 @@ namespace DemoProject.Controllers
             if(user==null) return Unauthorized("Invalid username or password.");
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
+            CurrentUser=user.Id;
             return Ok(new
             {
                 Token = tokenString,
@@ -86,7 +87,46 @@ namespace DemoProject.Controllers
             });
 
         }
-        [Authorize]
+
+        [HttpGet("FindCurrentUserForToken")]
+        public async Task<IActionResult> CurrentUserForToken(string token)
+        {
+            var user = _userService.GetUserByToken(token);
+
+            if (user != null)
+            {
+                return Ok(new
+                {
+                   Username=user.Result.Username,
+                });
+            }
+            else
+            {
+                return BadRequest(new { });
+            }
+        }
+
+        [HttpGet("RouteToQuiz")]
+        public async Task<IActionResult> CheckQuizForm()
+        {
+            var item = await _quizService.GetQuizByUserId(CurrentUser);
+
+            if (item == null)
+            {
+                return Ok(new
+                {
+                    Check = true,//quiz sehifesi acilsin
+                });
+            }
+            return Ok(new
+            {
+                Check=false,//ana sehifeye kecsin
+            });
+        }
+
+
+
+            [Authorize]
 
         [HttpGet("currentUser")]
         public IActionResult GetCurrentUser()

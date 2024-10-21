@@ -19,8 +19,7 @@ namespace TaskFlow.Entities.Models
         public string? Gender { get; set; }
         public bool? IsOnline { get; set; } 
         public DateTime? Birthday { get; set; } 
-        public DateTime? LastLoginDate { get; set; }
-       
+        public DateTime? LastLoginDate { get; set; } 
 
         public virtual List<Project>? Projects { get; set; } 
         public virtual List<Work>? TaskForUsers { get; set; } 
@@ -33,6 +32,7 @@ namespace TaskFlow.Entities.Models
         public virtual List<Friend>? Friends { get; set; } 
         public virtual List<Friend>? FriendsOf { get; set; }
         public virtual List<Notification>? Notifications { get; set; }
+        public virtual Quiz? Quiz { get; set; }  
 
     }
 }

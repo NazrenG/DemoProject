@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskFlow.Entities.Data;
 
@@ -11,9 +12,11 @@ using TaskFlow.Entities.Data;
 namespace TaskFlow.Entities.Migrations
 {
     [DbContext(typeof(TaskFlowContext))]
-    partial class TaskFlowContextModelSnapshot : ModelSnapshot
+    [Migration("20241021200450_Init3")]
+    partial class Init3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,14 +183,13 @@ namespace TaskFlow.Entities.Migrations
                     b.Property<string>("UsagePurpose")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Quizzes");
                 });
@@ -447,7 +449,9 @@ namespace TaskFlow.Entities.Migrations
                 {
                     b.HasOne("TaskFlow.Entities.Models.User", "User")
                         .WithOne("Quiz")
-                        .HasForeignKey("TaskFlow.Entities.Models.Quiz", "UserId");
+                        .HasForeignKey("TaskFlow.Entities.Models.Quiz", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

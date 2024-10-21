@@ -14,5 +14,7 @@ namespace TaskFlow.Entities.Models
         public string? AgeRange { get; set; }
         public string? Profession { get; set; }
         public string? UsagePurpose { get; set; }
+        public int? UserId { get; set; }
+        public virtual User? User { get; set; }
     }
 }
