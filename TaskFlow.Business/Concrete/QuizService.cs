@@ -26,5 +26,10 @@ namespace TaskFlow.DataAccess.Concrete
         {
             return await dal.GetAll();
         }
+
+        public async Task Update(Quiz quiz)
+        {
+            await  dal.Update(quiz);
+        }
     }
 }
