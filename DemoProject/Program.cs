@@ -46,9 +46,13 @@ builder.Services.AddScoped<IFriendDal,FriendDal>();
 builder.Services.AddScoped<IFriendService,FriendService>(); 
 builder.Services.AddScoped<ITaskAssignDal,TaskAssignDal>(); 
 builder.Services.AddScoped<ITaskAssignService,TaskAssigneService>(); 
+builder.Services.AddScoped<INotificationDal,NotificationDal>(); 
+builder.Services.AddScoped<INotificationService,NotificationService>(); 
 
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value);
+
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -59,6 +63,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = false,
             ValidateAudience = false,
+          
         };
     });
 

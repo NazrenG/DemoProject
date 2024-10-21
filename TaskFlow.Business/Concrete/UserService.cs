@@ -9,7 +9,7 @@ using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Concrete
 {
-    public class UserService:IUserService
+    public class UserService : IUserService
     {
         private readonly IUserDal dal;
 
@@ -18,9 +18,9 @@ namespace TaskFlow.DataAccess.Concrete
             this.dal = dal;
         }
 
-        public async  Task Add(User user)
+        public async Task Add(User user)
         {
-           await dal.Add(user);
+            await dal.Add(user);
         }
 
         public async Task Delete(User user)
@@ -30,7 +30,7 @@ namespace TaskFlow.DataAccess.Concrete
 
         public async Task<User> GetUserById(int id)
         {
-            return await dal.GetById(f=>f.Id==id);
+            return await dal.GetById(f => f.Id == id);
         }
 
         public async Task<List<User>> GetUsers()
@@ -60,13 +60,19 @@ namespace TaskFlow.DataAccess.Concrete
 
         public async Task<User> Register(User user, string password)
         {
-            var add = user.Username;
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
-            user.PasswordSalt = passwordSalt;
-            user.PasswordHash = passwordHash;
-            await dal.Add(user); 
-            return user;
+            var list = await dal.GetAll(u => u.Email == user.Email);
+            if (list.Count == 0)
+            {
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                user.PasswordSalt = passwordSalt;
+                user.PasswordHash = passwordHash;
+                await dal.Add(user);
+                return user;
+            }
+            throw new Exception("User already exists with this email.");
+
+
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -80,14 +86,19 @@ namespace TaskFlow.DataAccess.Concrete
 
         public async Task Update(User user)
         {
-            await  dal.Update(user);
+            await dal.Update(user);
         }
 
         public async Task<bool> UserExists(string username)
         {
-            var hasExist = await dal.GetById(f=>f.Username==username);
-            return hasExist!=null?true:false;
+            var hasExist = await dal.GetById(f => f.Username == username);
+            return hasExist != null ? true : false;
         }
- 
+
+        public async Task<int> GetAllUserCount()
+        {
+            var list = await dal.GetAll();
+            return list.Count;
+        }
     }
 }

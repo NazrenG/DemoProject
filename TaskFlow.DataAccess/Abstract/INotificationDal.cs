@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskFlow.Core.DataAccess;
 using TaskFlow.Entities.Models;
 
 namespace TaskFlow.DataAccess.Abstract
 {
-    public interface IQuizService
+  public  interface INotificationDal: IEntityRepository<Notification>
     {
-        Task Add(Quiz quiz);    
-        Task Update(Quiz quiz);    
-        Task<List<Quiz>> Quizzes(); 
     }
 }

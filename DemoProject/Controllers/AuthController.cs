@@ -8,6 +8,8 @@ using TaskFlow.Entities.Data;
 using TaskFlow.DataAccess.Abstract;
 using TaskFlow.Entities.Models;
 using DemoProject.DTOs;
+using TaskFlow.DataAccess.Concrete;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DemoProject.Controllers
 {
@@ -19,12 +21,15 @@ namespace DemoProject.Controllers
         private readonly TaskFlowContext _context;
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
+        private readonly IQuizService _quizService;
+        
 
-        public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService)
+        public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService,IQuizService quizService)
         {
             _context = context;
             _configuration = configuration;
             _userService = userService;
+            _quizService = quizService; 
         }
 
         [HttpPost("register")]
@@ -39,6 +44,7 @@ namespace DemoProject.Controllers
                 // AgeGroup = userDto.AgeGroup,
             };
               await _userService.Register(newUser, userDto.Password);
+            await _quizService.Add(new Quiz());
             return Ok(new
             {
                 message = "User registered successfully",
@@ -66,14 +72,51 @@ namespace DemoProject.Controllers
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
-
+            if(user==null) return Unauthorized("Invalid username or password.");
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            return Ok(new {token= tokenString,
+
+
+            return Ok(new {token= tokenString
                
+           
             });
 
         }
+        [Authorize]
+
+        [HttpGet("currentUser")]
+        public IActionResult GetCurrentUser()
+        {
+            var userId=HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           
+           //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var username = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+            var email = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+            var surname = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
+            var gender = HttpContext.User.FindFirst(ClaimTypes.Gender)?.Value;
+            var birthday = HttpContext.User.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+            var phone = HttpContext.User.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            var country = HttpContext.User.FindFirst(ClaimTypes.Country)?.Value;
+  
+            if (userId == null)
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            return Ok(new
+            {
+                UserId = userId,
+                Username = username,
+                Email = email,
+                Surname = surname,
+                Gender = gender,
+                Birthday = birthday,
+                Phone = phone,
+                Country = country,
+            });
+        }
+
         [HttpGet("AllUsers")]
         public async Task<IEnumerable<UserForRegister>> AllUsers()
         {
@@ -97,6 +140,16 @@ namespace DemoProject.Controllers
             });
             return list;
         }
+
+        [HttpGet("UsersCount")]
+        public async Task<IActionResult> GetUserCount()
+        {
+            var count = await _userService.GetAllUserCount();
+
+            return Ok(count);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<UserForRegister> GetUser(int id)
         {
@@ -148,6 +201,20 @@ namespace DemoProject.Controllers
                 item.Image = value.Image;
                 item.Gender = value.Gender;
                 item.IsOnline = value.IsOnline;
+                await _userService.Update(item);
+                return Ok();
+            }
+            return BadRequest();
+
+        }
+        [HttpPut("NameOrLastname/{id}")]
+        public async Task<IActionResult> PutNameAndSurname(int id, [FromBody] UserForRegister value)
+        {
+            var item = await _userService.GetUserById(id);
+            if (item != null)
+            { 
+                item.Firstname = value.Firstname;
+                item.Lastname = value.Lastname;
                 await _userService.Update(item);
                 return Ok();
             }

@@ -37,20 +37,28 @@ namespace DemoProject.Controllers
         }
 
      
-        // POST api/<QuizController>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] QuizDto value)
+        // put api/<QuizController>
+        [HttpPut("Profession")]
+        public async Task<IActionResult> PutProfession([FromBody] string value)
         {
-            var item = new Quiz
-            {
-                AgeRange = value.AgeRange,
-                Profession = value.Profession,
-                UsagePurpose = value.UsagePurpose,
-            };
-            await _quizService.Add(item);
-            return Ok(item);
+            var items=await _quizService.Quizzes();
+           var last= items.Last();
+          
+            last.Profession = value;    
+            await _quizService.Update(last);
+            return Ok();
         }
 
-        
+        [HttpPut("Occupation")]
+        public async Task<IActionResult> PutOccupation([FromBody] string value)
+        {
+            var items = await _quizService.Quizzes();
+            var last = items.Last();
+
+            last.UsagePurpose = value;
+            await _quizService.Update(last);
+            return Ok();
+        }
+
     }
 }

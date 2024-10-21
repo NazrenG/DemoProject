@@ -12,8 +12,9 @@ namespace TaskFlow.DataAccess.Abstract
 
         Task<List<Project>> GetProjects();
         Task<Project> GetProjectById(int id);
-     Task Add(Project project  );
-     Task Update(Project project);
-     Task Delete(Project project);
+        Task Add(Project project);
+        Task Update(Project project);
+        Task Delete(Project project);
+        Task<int> GetUserProjectCount(int userId);
     }
 }

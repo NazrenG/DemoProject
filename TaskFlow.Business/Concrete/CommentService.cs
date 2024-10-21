@@ -37,6 +37,12 @@ namespace TaskFlow.DataAccess.Concrete
            return await dal.GetAll();
         }
 
+        public async Task<int> GetCount()
+        {
+            var list= await dal.GetAll();   
+            return list.Count;
+        }
+
         public async  Task Update(Comment address)
         {
             await dal.Update(address);  

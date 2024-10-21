@@ -32,6 +32,7 @@ namespace TaskFlow.Entities.Models
 
         public virtual List<Friend>? Friends { get; set; } 
         public virtual List<Friend>? FriendsOf { get; set; }
+        public virtual List<Notification>? Notifications { get; set; }
 
     }
 }
