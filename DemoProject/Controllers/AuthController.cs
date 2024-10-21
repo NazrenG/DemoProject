@@ -51,7 +51,10 @@ namespace DemoProject.Controllers
 
             var user = await _userService.Login(userDto.Username, userDto.Password);
             var tokenHandler = new JwtSecurityTokenHandler();
-
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Invalid username or password" });
+            }
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Token").Value);
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -66,7 +69,9 @@ namespace DemoProject.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            return Ok(tokenString);
+            return Ok(new {token= tokenString,
+               
+            });
 
         }
         [HttpGet("AllUsers")]
