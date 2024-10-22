@@ -49,7 +49,7 @@ namespace DemoProject.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserForRegister userDto)
         {
-            var ad = userDto.Username;
+            var user = await GetUserAsync();
             var newUser = new User
             {
                 UserName = userDto.Username,
@@ -58,7 +58,11 @@ namespace DemoProject.Controllers
                 // AgeGroup = userDto.AgeGroup,
             };
             await _userService.Register(newUser, userDto.Password);
-            await _quizService.Add(new Quiz());
+            await _quizService.Add(new Quiz
+            {
+                UserId=user.Id,
+            });
+
             return Ok(new
             {
                 message = "User registered successfully",
