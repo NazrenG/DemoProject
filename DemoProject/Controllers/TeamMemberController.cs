@@ -72,7 +72,7 @@ namespace DemoProject.Controllers
 
       
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] int value)
+        public async Task<IActionResult> Put(int id, [FromBody] string value)
         {
             var item = await _teamMemberService.GetTaskMemberById(id);
             if (item == null)

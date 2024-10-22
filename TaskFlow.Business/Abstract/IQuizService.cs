@@ -11,7 +11,7 @@ namespace TaskFlow.DataAccess.Abstract
     {
         Task Add(Quiz quiz);    
         Task Update(Quiz quiz);
-        Task<Quiz> GetQuizByUserId(int userId);
+        Task<Quiz> GetQuizByUserId(string userId);
         Task<List<Quiz>> Quizzes(); 
     }
 }

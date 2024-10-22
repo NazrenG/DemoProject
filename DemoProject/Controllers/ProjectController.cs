@@ -13,17 +13,21 @@ namespace DemoProject.Controllers
     {
         private readonly IProjectService _projectService;
 
-        public ProjectController(IProjectService projectService)
+        private readonly IUserService _userService;
+
+        public ProjectController(IProjectService projectService, IUserService userService)
         {
             _projectService = projectService;
+            _userService = userService; 
         }
 
         // GET: api/<ProjectController>
         [HttpGet("AllProjects")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string token)
         {
+            var user = _userService.GetUserByToken(token);
             var list = await _projectService.GetProjects();
-            var items = list.Select(p =>
+            var items = list.Where(p=>p.CreatedById==user.Result.Id).Select(p =>
             {
                 return new ProjectDto
                 {
@@ -37,7 +41,7 @@ namespace DemoProject.Controllers
         }
 
         [HttpGet("UserProjectCount")]
-        public async Task<IActionResult> GetUserProjectCount(int id)
+        public async Task<IActionResult> GetUserProjectCount(string id)
         {
             var count = await _projectService.GetUserProjectCount(id);
             

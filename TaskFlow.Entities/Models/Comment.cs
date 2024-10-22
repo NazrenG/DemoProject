@@ -12,7 +12,7 @@ namespace TaskFlow.Entities.Models
     {
         public string? Context {  get; set; }
         public int ? TaskForUserId { get; set; }
-        public int ? UserId { get; set; }
+        public string ? UserId { get; set; }
 
         public virtual Work? TaskForUser { get; set; }
         public virtual User? User { get; set; }

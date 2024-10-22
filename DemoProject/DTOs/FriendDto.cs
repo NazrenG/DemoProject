@@ -2,7 +2,7 @@
 {
     public class FriendDto
     {
-        public int? UserId { get; set; }
-        public int? UserFriendId { get; set; }
+        public string? UserId { get; set; }
+        public string? UserFriendId { get; set; }
     }
 }

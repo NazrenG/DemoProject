@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿//using Microsoft.AspNet.Identity.EntityFramework;
+//using Microsoft.AspNet.Identity.EntityFramework;
+//using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+//using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Generic; 
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using TaskFlow.Core.Abstract;
 
@@ -12,6 +15,7 @@ namespace TaskFlow.Core.DataAccess.EntityFramework
     public class EFEntityBaseRepository<TContext, TEntity> : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TContext : DbContext
+
     {
         private readonly TContext _context;
 
@@ -19,10 +23,11 @@ namespace TaskFlow.Core.DataAccess.EntityFramework
         {
             _context = context;
         }
+
         public async Task Add(TEntity entity)
         {
             var addedEntity = _context.Entry(entity);
-            addedEntity.State = EntityState.Added;
+            addedEntity.State=EntityState.Added;
             await _context.SaveChangesAsync();
         }
 
@@ -47,8 +52,8 @@ namespace TaskFlow.Core.DataAccess.EntityFramework
 
         public async Task Update(TEntity entity)
         {
-            var deletedEntity = _context.Entry(entity);
-            deletedEntity.State = EntityState.Modified;
+            var updatedEntity = _context.Entry(entity);
+            updatedEntity.State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
     }

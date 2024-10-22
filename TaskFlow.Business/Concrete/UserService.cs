@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TaskFlow.DataAccess.Abstract;
 using TaskFlow.Entities.Models;
@@ -13,117 +11,97 @@ namespace TaskFlow.DataAccess.Concrete
 {
     public class UserService : IUserService
     {
-        private readonly IUserDal dal;
+        private readonly IUserDal _dal;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public UserService(IUserDal dal)
+        public UserService(IUserDal dal, UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager)
         {
-            this.dal = dal;
+            _dal = dal;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _signInManager = signInManager;
         }
 
         public async Task Add(User user)
         {
-            await dal.Add(user);
+            await _dal.Add(user);
         }
 
         public async Task Delete(User user)
         {
-            await dal.Delete(user);
+            await _dal.Delete(user);
         }
 
-        public async Task<User> GetUserById(int id)
+        public async Task<User> GetUserById(string id)
         {
-            return await dal.GetById(f => f.Id == id);
+            return await _dal.GetById(f => f.Id == id);
         }
 
         public async Task<List<User>> GetUsers()
         {
-            return await dal.GetAll();
+            return await _dal.GetAll();
         }
 
         public async Task<User> Login(string username, string password)
         {
-            var user = await dal.GetById(f => f.Username == username);
-            if (user == null) { return null; }
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-            {
-                return null;
-            }
-            return user;
-        }
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return null;
 
-        private bool VerifyPasswordHash(string password, byte[]? passwordHash, byte[]? passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash); ;
-            }
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+            return result.Succeeded ? user : null;
         }
 
         public async Task<User> Register(User user, string password)
         {
-            var list = await dal.GetAll(u => u.Email == user.Email);
-            if (list.Count == 0)
+            var existingUser = await _userManager.FindByEmailAsync(user.Email);
+            if (existingUser != null)
             {
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
-                user.PasswordSalt = passwordSalt;
-                user.PasswordHash = passwordHash;
-                await dal.Add(user);
-                return user;
+                throw new Exception("User already exists with this email.");
             }
-            throw new Exception("User already exists with this email.");
 
-
-        }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
+            var result = await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
             {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                throw new Exception("Failed to create user.");
             }
+
+            return user;
         }
 
         public async Task Update(User user)
         {
-            await dal.Update(user);
+            await _dal.Update(user);
         }
 
         public async Task<bool> UserExists(string username)
         {
-            var hasExist = await dal.GetById(f => f.Username == username);
-            return hasExist != null ? true : false;
+            var hasExist = await _userManager.FindByNameAsync(username);
+            return hasExist != null;
         }
 
         public async Task<int> GetAllUserCount()
         {
-            var list = await dal.GetAll();
-            return list.Count;
+            var users = await _dal.GetAll();
+            return users.Count;
         }
 
-
-        public Task<User>  GetUserByToken(string token)
+        public async Task<User> GetUserByToken(string token)
         {
             try
-            { 
+            {
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
                 if (jwtToken == null)
                     return null;
-                 
-                var userIdClaim = jwtToken.Claims.First(claim => claim.Type == "nameid").Value;
-                 
-                int userId = int.Parse(userIdClaim);
-                 
-                var user = dal.GetById(p=>p.Id==userId);
 
-                return user;
+                var userIdClaim = jwtToken.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+                return await _userManager.FindByIdAsync(userIdClaim);
             }
             catch (Exception ex)
-            { 
+            {
                 Console.WriteLine($"Error decoding token: {ex.Message}");
                 return null;
             }

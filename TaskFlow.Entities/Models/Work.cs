@@ -20,7 +20,7 @@ namespace TaskFlow.Entities.Models
         public string? Priority { get; set; }// Urgent, Primary, Simple
         public int ProjectId { get; set; }
 
-        public int CreatedById { get; set; }//userId
+        public string? CreatedById { get; set; }//userId
         //
          
         public virtual User? CreatedBy { get; set; }

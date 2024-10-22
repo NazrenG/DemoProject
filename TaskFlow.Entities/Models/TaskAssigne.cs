@@ -11,7 +11,7 @@ namespace TaskFlow.Entities.Models
     public class TaskAssigne:BaseEntity ,IEntity
     { 
         public int TaskForUserId { get; set; }
-        public int UserId { get; set; } 
+        public string UserId { get; set; } 
 
         public virtual Work TaskForUser { get; set; }
         public virtual User User { get; set; }

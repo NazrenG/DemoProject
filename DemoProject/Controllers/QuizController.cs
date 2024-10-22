@@ -31,7 +31,7 @@ namespace DemoProject.Controllers
                     AgeRange = l.AgeRange,
                     Profession = l.Profession,
                     UsagePurpose = l.UsagePurpose,
-                    UserId =99,
+                    UserId =l.UserId,
                 };
             });
             return Ok(items);

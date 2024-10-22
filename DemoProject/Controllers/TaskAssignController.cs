@@ -70,7 +70,7 @@ namespace DemoProject.Controllers
 
         // PUT api/<TaskAssignController>/5
         [HttpPut("ChangeUser/{id}")]
-        public async Task<IActionResult> PutUser(int id, [FromBody] int value)
+        public async Task<IActionResult> PutUser(int id, [FromBody] string value)
         {
             var item = await taskAssignService.GetById(id);
             if (item == null)

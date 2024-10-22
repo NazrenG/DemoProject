@@ -1,14 +1,18 @@
 
 using DemoProject.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskFlow.Business.Abstract;
 using TaskFlow.Business.Concrete;
+using TaskFlow.Core.DataAccess;
+using TaskFlow.Core.DataAccess.EntityFramework;
 using TaskFlow.DataAccess.Abstract;
 using TaskFlow.DataAccess.Concrete;
 using TaskFlow.Entities.Data;
+using TaskFlow.Entities.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +29,7 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
-
+ 
 builder.Services.AddScoped<IUserDal,UserDal>();
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<ICommentDal,CommentDal>();
@@ -73,6 +77,9 @@ builder.Services.AddDbContext<TaskFlowContext>(opt =>
     opt.UseSqlServer(conn);
     opt.UseLazyLoadingProxies();
 });
+builder.Services.AddIdentity<User, Role>()
+    .AddEntityFrameworkStores<TaskFlowContext>()
+    .AddDefaultTokenProviders();
 
 
 var app = builder.Build();

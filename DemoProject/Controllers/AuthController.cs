@@ -23,7 +23,7 @@ namespace DemoProject.Controllers
         private readonly IUserService _userService;
         private readonly IQuizService _quizService;
 
-        public static int CurrentUser;
+        public static string CurrentUser;
         public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService,IQuizService quizService)
         {
             _context = context;
@@ -38,7 +38,7 @@ namespace DemoProject.Controllers
             var ad = userDto.Username;
             var newUser = new User
             {
-                Username = userDto.Username,
+                UserName = userDto.Username,
                 Email = userDto.Email,
 
                 // AgeGroup = userDto.AgeGroup,
@@ -67,7 +67,7 @@ namespace DemoProject.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[] {
                     new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                    new Claim(ClaimTypes.Name,user.Username)
+                    new Claim(ClaimTypes.Name,user.UserName)
                 }),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -82,7 +82,7 @@ namespace DemoProject.Controllers
                 User = new
                 {
                     Id = user.Id,
-                    Username = user.Username,
+                    Username = user.UserName,
                     Firstname=user.Firstname,
                     Lastname=user.Lastname,
 
@@ -100,7 +100,7 @@ namespace DemoProject.Controllers
             {
                 return Ok(new
                 {
-                   Username=user.Result.Username,
+                   Username=user.Result.UserName,
                 });
             }
             else
@@ -129,21 +129,15 @@ namespace DemoProject.Controllers
 
 
 
-            [Authorize]
-
-        [HttpGet("currentUser")]
+        [Authorize]
+        [HttpGet("currentUser")] //sehv
         public IActionResult GetCurrentUser()
         {
             var userId=HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
            
            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var username = HttpContext.User.FindFirstValue(ClaimTypes.Name);
-            var email = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
-            var surname = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
-            var gender = HttpContext.User.FindFirst(ClaimTypes.Gender)?.Value;
-            var birthday = HttpContext.User.FindFirst(ClaimTypes.DateOfBirth)?.Value;
-            var phone = HttpContext.User.FindFirst(ClaimTypes.MobilePhone)?.Value;
-            var country = HttpContext.User.FindFirst(ClaimTypes.Country)?.Value;
+            //
   
             if (userId == null)
             {
@@ -154,12 +148,7 @@ namespace DemoProject.Controllers
             {
                 UserId = userId,
                 Username = username,
-                Email = email,
-                Surname = surname,
-                Gender = gender,
-                Birthday = birthday,
-                Phone = phone,
-                Country = country,
+             
             });
         }
 
@@ -173,7 +162,7 @@ namespace DemoProject.Controllers
                 {
                     Firstname = p.Firstname,
                     Lastname = p.Lastname,
-                    Username = p.Username,
+                    Username = p.UserName,
                     Email = p.Email,
                     Phone = p.Phone,
                     Occupation = p.Occupation,
@@ -195,16 +184,38 @@ namespace DemoProject.Controllers
             return Ok(count);
         }
 
+        [HttpGet("PendingProjectCount")]
+        public async Task<IActionResult> GetPendingProjectCount(string token)
+        {
+            var user = _userService.GetUserByToken(token);
+            var item = await _userService.GetUsers();
+          var list=  item.Where(p => p.Id == user.Result.Id) 
+        .SelectMany(p => p.Projects ?? Enumerable.Empty<Project>())
+        .Count(i => i.IsCompleted == false); ;
+            return Ok(list);
+        }
+        [HttpGet("FinishedProjectCount")]
+        public async Task<IActionResult> GetFinishedProjectCount(string token)
+        {
+            var user = _userService.GetUserByToken(token);
+            var item = await _userService.GetUsers();
+            var list = item.Where(p => p.Id == user.Result.Id)
+          .SelectMany(p => p.Projects ?? Enumerable.Empty<Project>())
+          .Count(i => i.IsCompleted == true); 
+            return Ok(list);
+        }
+
 
         [HttpGet("{id}")]
-        public async Task<UserForRegister> GetUser(int id)
+        public async Task<UserForRegister> GetUser(string id)
         {
             var item = await _userService.GetUserById(id);
+
             return new UserForRegister
             {
                 Firstname = item.Firstname,
                 Lastname = item.Lastname,
-                Username = item.Username,
+                Username = item.UserName,
                 Email = item.Email,
                 Phone = item.Phone,
                 Occupation = item.Occupation,
@@ -216,10 +227,11 @@ namespace DemoProject.Controllers
             };
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [HttpDelete("{token}")]
+        public async Task<IActionResult> DeleteUser(string token)
         {
-            var item = await _userService.GetUserById(id);
+            var user = _userService.GetUserByToken(token);
+            var item = await _userService.GetUserById(user.Result.Id);
             if (item != null)
             {
                 await _userService.Delete(item);
@@ -229,14 +241,13 @@ namespace DemoProject.Controllers
 
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UserForRegister value)
+        [HttpPut("{token}")]
+        public async Task<IActionResult> Put(string token, [FromBody] UserForRegister value)
         {
-            var item = await _userService.GetUserById(id);
+            var user = _userService.GetUserByToken(token);
+            var item = await _userService.GetUserById(user.Result.Id);
             if (item != null)
-            {
-                item.Id = id;
-                item.Username = value.Username;
+            {  
                 item.Firstname = value.Firstname;
                 item.Lastname = value.Lastname;
                 item.Email = value.Email;
@@ -253,10 +264,11 @@ namespace DemoProject.Controllers
             return BadRequest();
 
         }
-        [HttpPut("NameOrLastname/{id}")]
-        public async Task<IActionResult> PutNameAndSurname(int id, [FromBody] UserForRegister value)
+        [HttpPut("NameOrLastname/{token}")]
+        public async Task<IActionResult> PutNameAndSurname(string token, [FromBody] UserForRegister value)
         {
-            var item = await _userService.GetUserById(id);
+            var user = _userService.GetUserByToken(token);
+            var item = await _userService.GetUserById(user.Result.Id);
             if (item != null)
             { 
                 item.Firstname = value.Firstname;

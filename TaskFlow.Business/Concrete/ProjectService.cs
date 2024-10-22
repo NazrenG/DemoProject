@@ -42,7 +42,7 @@ namespace TaskFlow.DataAccess.Concrete
            await dal.Update(project);
         }
 
-        public async Task<int> GetUserProjectCount(int userId)
+        public async Task<int> GetUserProjectCount(string userId)
         {
             var list = await dal.GetAll(p => p.CreatedById == userId);
             return list.Count();    

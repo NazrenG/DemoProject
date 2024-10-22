@@ -11,7 +11,7 @@ namespace TaskFlow.DataAccess.Abstract
     public interface IUserService
     {
         Task<List<User>> GetUsers();
-        Task<User> GetUserById(int id);
+        Task<User> GetUserById(string id);
        Task Add(User user);
        Task Update(User user);
        Task Delete(User user);

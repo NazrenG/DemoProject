@@ -10,8 +10,8 @@ namespace TaskFlow.Entities.Models
 {
     public class Friend:BaseEntity, IEntity
     { 
-        public int? UserId { get; set; }
-        public int? UserFriendId { get; set; }
+        public string? UserId { get; set; }
+        public string? UserFriendId { get; set; }
 
         public virtual User? User { get; set; }  
         public virtual User? UserFriend { get; set; }  

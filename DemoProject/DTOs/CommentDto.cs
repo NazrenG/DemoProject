@@ -4,6 +4,6 @@
     {
         public string? Context { get; set; }
         public int? TaskForUserId { get; set; }
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
     }
 }

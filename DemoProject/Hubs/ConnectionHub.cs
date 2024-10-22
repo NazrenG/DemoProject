@@ -30,7 +30,7 @@ namespace DemoProject.Hubs
                 await _userManager.UpdateAsync(user);
 
             }
-            await Clients.All.SendAsync("ReceiveConnectInfo", $"{user.Username} has connected");
+            await Clients.All.SendAsync("ReceiveConnectInfo", $"{user?.UserName} has connected");
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -44,7 +44,7 @@ namespace DemoProject.Hubs
                 await _userManager.UpdateAsync(user);
 
             }
-            await Clients.Others.SendAsync("DisconnectInfo", $"{user.Username} has disconnected");
+            await Clients.Others.SendAsync("DisconnectInfo", $"{user.UserName} has disconnected");
 
         }
     }
