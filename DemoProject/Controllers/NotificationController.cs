@@ -1,6 +1,8 @@
 ﻿using DemoProject.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Business.Abstract;
+using TaskFlow.DataAccess.Abstract;
+using TaskFlow.DataAccess.Concrete;
 using TaskFlow.Entities.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -13,10 +15,29 @@ namespace DemoProject.Controllers
     {
 
         private readonly INotificationService notificationService;
+        private readonly IUserService userService;
 
-        public NotificationController(INotificationService notificationService)
+        public NotificationController(INotificationService notificationService, IUserService userService)
         {
             this.notificationService = notificationService;
+            this.userService = userService;
+        }
+
+
+        //url-den gelen token
+        private async Task<User> GetUserAsync()
+        {
+            var tokenFromHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(tokenFromHeader) || !tokenFromHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            var tokenValue = tokenFromHeader.Substring("Bearer ".Length).Trim();
+            var user = await userService.GetUserByToken(tokenValue);
+
+            return user;
         }
 
         // GET: api/<NotificationController>
@@ -34,12 +55,13 @@ namespace DemoProject.Controllers
             });
             return Ok(items);
         }
-        [HttpGet("NotificationCount")]
+        [HttpGet("UserNotificationCount")]
         public async Task<IActionResult> GetCount()
         {
-            var count = await notificationService.GetCount();
+            var user= await GetUserAsync(); 
+            var list = await notificationService.GetNotifications();
           
-            return Ok(count);
+            return Ok(list.Where(l=>l.UserId==user.Id).Count());
         }
 
 

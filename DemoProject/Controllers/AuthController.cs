@@ -22,7 +22,22 @@ namespace DemoProject.Controllers
         private readonly IUserService _userService;
         private readonly IQuizService _quizService;
 
-        public static string CurrentUser;
+        //url-den gelen token
+        private async Task<User> GetUserAsync()
+        {
+            var tokenFromHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(tokenFromHeader) || !tokenFromHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            var tokenValue = tokenFromHeader.Substring("Bearer ".Length).Trim();
+            var user = await _userService.GetUserByToken(tokenValue);
+
+            return user;
+        }
+
         public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService, IQuizService quizService)
         {
             _context = context;
@@ -74,7 +89,7 @@ namespace DemoProject.Controllers
             if (user == null) return Unauthorized("Invalid username or password.");
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            CurrentUser = user.Id;
+         
             return Ok(new
             {
                 Token = tokenString,
@@ -109,7 +124,8 @@ namespace DemoProject.Controllers
         [HttpGet("RouteToQuiz")]
         public async Task<IActionResult> CheckQuizForm()
         {
-            var item = await _quizService.GetQuizByUserId(CurrentUser);
+            var user=await GetUserAsync();
+            var item = await _quizService.GetQuizByUserId(user.Id);
 
             if (item == null)
             {
