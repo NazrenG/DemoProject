@@ -13,14 +13,14 @@ namespace TaskFlow.DataAccess.Concrete
             this.dal = dal;
         }
 
-        public async  Task Add( Work task)
-        { 
+        public async Task Add(Work task)
+        {
             await dal.Add(task);
         }
 
         public async Task Delete(Work task)
         {
-           await dal.Delete(task);
+            await dal.Delete(task);
         }
 
         public async Task<Work> GetTaskById(int id)
@@ -33,9 +33,10 @@ namespace TaskFlow.DataAccess.Concrete
             return await dal.GetAll();
         }
 
+       
         public async Task Update(Work task)
         {
-          await dal.Update(task);
+            await dal.Update(task);
         }
     }
 }

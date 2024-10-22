@@ -14,18 +14,37 @@ namespace DemoProject.Controllers
     public class WorkController : ControllerBase
     {
         private readonly ITaskService taskService;
+        private readonly IUserService userService;
 
-        public WorkController(ITaskService taskService)
+        public WorkController(ITaskService taskService, IUserService userService)
         {
             this.taskService = taskService;
+            this.userService = userService;
+        }
+
+        //url-den gelen token
+        private async Task<User> GetUserAsync()
+        {
+            var tokenFromHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(tokenFromHeader) || !tokenFromHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            var tokenValue = tokenFromHeader.Substring("Bearer ".Length).Trim();
+            var user = await userService.GetUserByToken(tokenValue);
+
+            return user;
         }
 
         // GET: api/<WorkController>
-        [HttpGet("AllWorks")]
-        public async Task<IEnumerable<WorkDto>> Get()
+        [HttpGet("UserTasks")]
+        public async Task<IEnumerable<WorkDto>> GetUserTasks()
         {
+            var user= await GetUserAsync(); 
             var list = await taskService.GetTasks();
-            var items = list.Select(p =>
+            var items = list.Where(t=>t.CreatedById==user.Id).Select(p =>
             {
                 return new WorkDto
                 {
@@ -62,6 +81,15 @@ namespace DemoProject.Controllers
                 ProjectId = item.ProjectId,
             };
             return Ok(work);
+        }
+
+        [HttpGet("UserTasksCount")]
+        public async Task<IActionResult> GetUserTaskCount()
+        {
+            var user = await GetUserAsync();
+            var item = await taskService.GetTasks();
+            
+            return Ok(item.Where(t=>t.CreatedById==user.Id).Count());
         }
 
         // POST api/<WorkController>

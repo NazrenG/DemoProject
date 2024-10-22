@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,12 +23,12 @@ namespace DemoProject.Controllers
         private readonly IQuizService _quizService;
 
         public static string CurrentUser;
-        public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService,IQuizService quizService)
+        public AuthController(TaskFlowContext context, IConfiguration configuration, IUserService userService, IQuizService quizService)
         {
             _context = context;
             _configuration = configuration;
             _userService = userService;
-            _quizService = quizService; 
+            _quizService = quizService;
         }
 
         [HttpPost("register")]
@@ -43,12 +42,12 @@ namespace DemoProject.Controllers
 
                 // AgeGroup = userDto.AgeGroup,
             };
-              await _userService.Register(newUser, userDto.Password);
+            await _userService.Register(newUser, userDto.Password);
             await _quizService.Add(new Quiz());
             return Ok(new
             {
                 message = "User registered successfully",
-                
+
             });
         }
         [HttpPost("login")]
@@ -72,19 +71,17 @@ namespace DemoProject.Controllers
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
-            if(user==null) return Unauthorized("Invalid username or password.");
+            if (user == null) return Unauthorized("Invalid username or password.");
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            CurrentUser=user.Id;
+            CurrentUser = user.Id;
             return Ok(new
             {
                 Token = tokenString,
                 User = new
                 {
                     Id = user.Id,
-                    Username = user.UserName,
-                    Firstname=user.Firstname,
-                    Lastname=user.Lastname,
+                    Username = user.UserName, 
 
                 }
             });
@@ -100,7 +97,7 @@ namespace DemoProject.Controllers
             {
                 return Ok(new
                 {
-                   Username=user.Result.UserName,
+                    Username = user.Result.UserName,
                 });
             }
             else
@@ -123,22 +120,17 @@ namespace DemoProject.Controllers
             }
             return Ok(new
             {
-                Check=false,//ana sehifeye kecsin
+                Check = false,//ana sehifeye kecsin
             });
         }
 
 
-
         [Authorize]
-        [HttpGet("currentUser")] //sehv
+        [HttpGet("currentUser")]
         public IActionResult GetCurrentUser()
         {
-            var userId=HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           
-           //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var username = HttpContext.User.FindFirstValue(ClaimTypes.Name);
-            //
-  
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (userId == null)
             {
                 return Unauthorized("User is not authenticated.");
@@ -147,10 +139,10 @@ namespace DemoProject.Controllers
             return Ok(new
             {
                 UserId = userId,
-                Username = username,
-             
+                Username = HttpContext.User.FindFirstValue(ClaimTypes.Name),
             });
         }
+
 
         [HttpGet("AllUsers")]
         public async Task<IEnumerable<UserForRegister>> AllUsers()
@@ -185,23 +177,28 @@ namespace DemoProject.Controllers
         }
 
         [HttpGet("PendingProjectCount")]
-        public async Task<IActionResult> GetPendingProjectCount(string token)
+        public async Task<IActionResult> GetPendingProjectCount()
         {
-            var user = _userService.GetUserByToken(token);
+
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
             var item = await _userService.GetUsers();
-          var list=  item.Where(p => p.Id == user.Result.Id) 
-        .SelectMany(p => p.Projects ?? Enumerable.Empty<Project>())
-        .Count(i => i.IsCompleted == false); ;
+            var list = item.Where(p => p.Id == userId)
+          .SelectMany(p => p.Projects ?? Enumerable.Empty<Project>())
+          .Count(i => i.IsCompleted == false); ;
             return Ok(list);
         }
         [HttpGet("FinishedProjectCount")]
         public async Task<IActionResult> GetFinishedProjectCount(string token)
         {
-            var user = _userService.GetUserByToken(token);
-            var item = await _userService.GetUsers();
-            var list = item.Where(p => p.Id == user.Result.Id)
+
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+             var item = await _userService.GetUsers();
+            var list = item.Where(p => p.Id == userId)
           .SelectMany(p => p.Projects ?? Enumerable.Empty<Project>())
-          .Count(i => i.IsCompleted == true); 
+          .Count(i => i.IsCompleted == true);
             return Ok(list);
         }
 
@@ -247,7 +244,7 @@ namespace DemoProject.Controllers
             var user = _userService.GetUserByToken(token);
             var item = await _userService.GetUserById(user.Result.Id);
             if (item != null)
-            {  
+            {
                 item.Firstname = value.Firstname;
                 item.Lastname = value.Lastname;
                 item.Email = value.Email;
@@ -270,7 +267,7 @@ namespace DemoProject.Controllers
             var user = _userService.GetUserByToken(token);
             var item = await _userService.GetUserById(user.Result.Id);
             if (item != null)
-            { 
+            {
                 item.Firstname = value.Firstname;
                 item.Lastname = value.Lastname;
                 await _userService.Update(item);

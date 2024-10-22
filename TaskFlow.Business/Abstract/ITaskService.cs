@@ -13,7 +13,7 @@ namespace TaskFlow.DataAccess.Abstract
         Task<Work> GetTaskById(int id);
       Task Add(Work task);
       Task Update(Work task);
-      Task Delete(Work task);
+      Task Delete(Work task); 
 
     }
 }

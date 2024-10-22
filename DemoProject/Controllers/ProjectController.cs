@@ -18,33 +18,56 @@ namespace DemoProject.Controllers
         public ProjectController(IProjectService projectService, IUserService userService)
         {
             _projectService = projectService;
-            _userService = userService; 
+            _userService = userService;
+        }
+        //url-den gelen token
+        private async Task<User> GetUserAsync()
+        {
+            var tokenFromHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(tokenFromHeader) || !tokenFromHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            var tokenValue = tokenFromHeader.Substring("Bearer ".Length).Trim();
+            var user = await _userService.GetUserByToken(tokenValue);
+
+            return user;
         }
 
-        // GET: api/<ProjectController>
-        [HttpGet("AllProjects")]
-        public async Task<IActionResult> Get(string token)
+        
+        [HttpGet("UserProjects")]
+        public async Task<IActionResult> GetUserProjects()
         {
-            var user = _userService.GetUserByToken(token);
-            var list = await _projectService.GetProjects();
-            var items = list.Where(p=>p.CreatedById==user.Result.Id).Select(p =>
+            var user = await GetUserAsync();
+
+            if (user == null)
             {
-                return new ProjectDto
+                return Unauthorized("Invalid token or user not found.");
+            }
+
+            var projects = await _projectService.GetProjects();
+            var userProjects = projects
+                .Where(p => p.CreatedById == user.Id)
+                .Select(p => new ProjectDto
                 {
-                    CreatedById = p.CreatedById, 
+                    CreatedById = p.CreatedById,
                     Description = p.Description,
                     IsCompleted = p.IsCompleted,
                     Title = p.Title,
-                };
-            });
-            return Ok(items);
+                });
+
+            return Ok(userProjects);
         }
 
+
         [HttpGet("UserProjectCount")]
-        public async Task<IActionResult> GetUserProjectCount(string id)
+        public async Task<IActionResult> GetUserProjectCount()
         {
-            var count = await _projectService.GetUserProjectCount(id);
-            
+            var user = await GetUserAsync();
+            var count = await _projectService.GetUserProjectCount(user.Id);
+
             return Ok(count);
         }
 
@@ -52,7 +75,7 @@ namespace DemoProject.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var item=await _projectService.GetProjectById(id);
+            var item = await _projectService.GetProjectById(id);
             if (item == null)
             {
                 return NotFound();
@@ -67,12 +90,25 @@ namespace DemoProject.Controllers
             return Ok(project);
 
         }
+        [HttpGet("ProjectTaskCount/{id}")]
+        public async Task<IActionResult> GetProjectTaskCount(int id)
+        {
+            var item = await _projectService.GetProjectById(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            var count=item.TaskForUsers?.Count();
+            
+            return Ok(count);
+
+        }
 
         // POST api/<ProjectController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ProjectDto value)
         {
-             
+
             var item = new Project
             {
                 CreatedById = value.CreatedById,
@@ -81,11 +117,11 @@ namespace DemoProject.Controllers
                 Title = value.Title,
             };
             await _projectService.Add(item);
-            return Ok(item);   
+            return Ok(item);
         }
 
         // PUT api/<ProjectController>/5
-   
+
         [HttpPut("ChangeTitle/{id}")]
         public async Task<IActionResult> PutTitle(int id, [FromBody] string value)
         {
@@ -131,12 +167,12 @@ namespace DemoProject.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item=await _projectService.GetProjectById(id);
+            var item = await _projectService.GetProjectById(id);
             if (item == null)
             {
                 return NotFound();
             }
-            await _projectService.Delete(item); 
+            await _projectService.Delete(item);
             return Ok(item);
         }
     }
